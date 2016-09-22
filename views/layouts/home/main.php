@@ -17,6 +17,7 @@
 <?=Html::jsFile('@resource/home/js/jquery.min.js')?>
 <?=Html::jsFile('@resource/home/js/layer.js')?>
 <?=Html::jsFile('@resource/home/js/main.js')?>
+<?=Html::jsFile('@resource/home/js/oe_varpop.js')?>
 <?=Html::cssFile('@resource/home/css/default.css')?>
 
 </head>

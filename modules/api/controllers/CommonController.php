@@ -66,6 +66,8 @@ class CommonController extends Controller{
 
     public function actionResendemail(){
         $email = isset($_REQUEST['email'])?$_REQUEST['email']:null;
+        //type : 0-激活账户，1-重置密码
+        $type = isset($_REQUEST['type'])?$_REQUEST['type']:null;
         if(!Yii::$app->request->isAjax){
             $this->renderErrorMsg(400);
          }
@@ -77,10 +79,17 @@ class CommonController extends Controller{
              $this->renderErrorMsg(300);
         }
         $CheckCode= rand(0,9).rand(0,9).rand(0,9).rand(0,9).rand(0,9).rand(0,9);
-        $body = "您此次激活账户的验证码为：".$CheckCode."，请在30分钟内完成验证，逾期无效！！！";
+        if($type == 1){
+            $body = "您此次重置密码的验证码为：".$CheckCode."，请在30分钟内完成验证，逾期无效，如非本人操作，请忽略！！！";
+            $subject = "重置密码";
+        }else{
+            $body = "您此次激活账户的验证码为：".$CheckCode."，请在30分钟内完成验证，逾期无效，如非本人操作，请忽略！！！";
+            $subject = "激活账户";
+        }
+        
         $mail= Yii::$app->mailer->compose();  
         $mail->setTo($user->email);    
-        $mail->setSubject("激活账户");      
+        $mail->setSubject($subject);      
         $mail->setHtmlBody($body);
         if($mail->send()){
             $model = new SafeCode;

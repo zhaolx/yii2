@@ -17,17 +17,7 @@
   <!--//oe-public-help End-->
 
   <div class="oe-passport-puts">
-	<h3>第一步 填写注册信息，校验收到的验证码</h3>
-
-    <dl>
-      <dd><em>*</em>用户名：</dd>
-      <dt>
-	    <input type="text" name="username" id="username" class="w1" />&nbsp;
-	    <span id="tips_password">（输入注册时填写的用户名）</span>
-	  </dt>
-	  <div class="clear"></div>
-    </dl>
-
+	<h3>第一步 填写邮箱，校验收到的验证码</h3>
 	<dl id="puts_email">
       <dd><em>*</em>邮箱：</dd>
       <dt>
@@ -83,80 +73,37 @@
 
 </div>
 <script type="text/javascript">
-function selectPutsType(type) {
-	if (type == "1") { //邮箱
-		$("#puts_email").show();
-		$("#puts_mobile").hide();
-
-	}
-	else { //手机
-		$("#puts_email").hide();
-		$("#puts_mobile").show();
-	}
-}
-
 $(function(){
 
-	$("#btn_code").bind("click", function(){ //获取验证码
-		$username = $("#username").val();
-		if ($username.length == 0) {
-			ToastShow("请输入用户名");
+	$("#btn_search").bind("click", function(){ //获取验证码
+		$name = $("#email").val();
+		if ($name.length == 0) {
+			ToastShow("请输入邮箱地址");
 			return false;
 		}
-		$type = $('input[name="gettype"]:checked').val();
-		if ($type == "" || typeof($type) == 'undefined') {
-			ToastShow("请选择取回方式");
-			return false;
-		}
-
-		if ($type == 1) { //邮箱
-			$name = $("#email").val();
-			if ($name.length == 0) {
-				ToastShow("请输入邮箱地址");
-				return false;
-			}
-		}
-		else { //手机
-			$name = $("#mobile").val();
-			if ($name.length == 0) {
-				ToastShow("请输入手机号码");
-				return false;
-			}
-		}
-		
 		$(this).val("发送中,请稍等...");
 		$.ajax({
 			type: "POST",
-			url: _ROOT_PATH + "index.php?c=passport",
+			url: "<?=Yii::$app->urlManager->createUrl('/api/common/resendemail')?>",
 			cache: false,
-			data: {a:"sendforget", username:$username, type:$type, name:$name, r:get_rndnum(8)},
+			data: {a:"sendforget", type:1, email:$name, r:get_rndnum(8)},
 			dataType: "json",
 			success: function(data) {
 				$json = eval(data);
-				$response = $json.response;
-				$result = $json.result;
+				$response = $json.status;
+				
 				if ($response == "1") {
-				    if ($type == 1) { //邮箱
-						ToastShow("验证码已发送到您的邮箱，请查收。");
-					}
-					else { //手机
-						ToastShow("验证码已发送您的手机，请查收。");
-					}
-				}
-				else {
-					if ($result.length > 0) {
-						ToastShow($result);
-					}
-					else {
-						ToastShow("验证码发送失败，请检查输入是否正确。");
-					}
+					ToastShow("验证码已发送到您的邮箱，请查收。");
+					resend(60);
+				}else {
+					ToastShow($json.msg);
 				}
 				$("#btn_code").val("获取验证码");
 
 			},
 			error: function() {
 				ToastShow("获取失败，请检查网络！");
-				$("#btn_code").val("获取验证码");
+				$("#btn_search").val("获取验证码");
 			}
 		});
 
@@ -216,8 +163,7 @@ $(function(){
 			dataType: "json",
 			success: function(data) {
 				$json = eval(data);
-				$response = $json.response;
-				$result = $json.result;
+				$response = $json.status;
 				if ($response == "1") {
 					ToastShow("取回密码成功");
 					setTimeout(function(){
@@ -242,4 +188,21 @@ $(function(){
 	});
 
 });
+function resend(t){
+	console.log(t);
+	if(t>0){
+		$("#btn_search").attr('disabled','disabled');
+		$("#btn_search").css("background","#e7e7e7");
+		$("#btn_search").css("color","#000");
+		$("#btn_search").html(t+"s后重新发送");
+	}else{
+		$("#btn_search").removeAttr('disabled');
+		$("#btn_search").css("background","#009EDF");
+		$("#btn_search").css("color","#fff");
+		$("#btn_search").html("重新发送");
+		return false;
+	}
+	t--;
+	setTimeout("resend("+t+")",1000);
+}
 </script>
