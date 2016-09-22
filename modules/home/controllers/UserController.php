@@ -182,13 +182,23 @@ class UserController extends Controller {
 		}
 	}
 
-	public function actionLogout(){
-		//$this->enableCsrfValidation = false;
+	public function actionLoggout(){
 		try{
 			//清除所有session
-			//Yii::$app->session->destroy();
-			//unset($_COOKIE);
-			$this->redirect(array('/home/index'));
+			Yii::$app->session->destroy();
+			return $this->redirect(['/home/index']);
+		}catch(Exception $e){
+			Yii::info($e, 'Error');
+		}
+	}
+
+	public function actionForgetpassword(){
+		try{
+			$count = User::find()->count();
+			$data['count'] = intval((time()-strtotime('2016-8-6'))/3600)*30 +$count;
+         	return $this->render('forgetpassword',array(                 
+      	 	'data' =>$data
+			));	
 		}catch(Exception $e){
 			Yii::info($e, 'Error');
 		}

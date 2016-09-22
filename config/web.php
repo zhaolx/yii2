@@ -21,6 +21,9 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'identityCookie' => ['name' => '__user_identity', 'httpOnly' => true],
+            'idParam' => '__user',            
+            'loginUrl' => ['/home/user/login'],
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',

@@ -150,7 +150,7 @@ class CommonController extends Controller{
         if($user->save()){
             Yii::$app->session->set('userid',$user->id);
             Yii::$app->session->set('username',$user->username);
-            $this->renderSuccessMsg('登录成功');
+            $this->renderSuccessMsg(['url'=>Yii::$app->urlManager->createUrl('/home/user/index')]);
         }else{
             $this->renderErrorMsg(500);
         }

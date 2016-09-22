@@ -1,3 +1,6 @@
+<style type="text/css">
+  #tips_post{color: red;}
+</style>
 <?php 
 use yii\helpers\Html;
 use yii\captcha\Captcha; 
@@ -12,7 +15,7 @@ use yii\captcha\Captcha;
   <div class="oe-public-help">
     <h2>
     还没有会员帐号？<a href="<?=Yii::$app->urlManager->createUrl('/home/user/reg')?>">点击注册</a> <br />
-    忘记了密码？<a href="<?=Yii::$app->urlManager->createUrl('/home/user/forget')?>">点击取回密码</a>
+    忘记了密码？<a href="<?=Yii::$app->urlManager->createUrl('/home/user/forgetpassword')?>">点击取回密码</a>
   </h2>
   <h3>登录遇到问题？</h3>
   <div class="oe-help-cont">
@@ -94,23 +97,17 @@ $(function(){
   
   $("#btn_post").bind("click", function(){ //提交
 
-    var type = $('input[name="logintype"]:checked').val();
-    if (type == "" || typeof(type) == 'undefined') {
-      type = 1;
-    }
-    
     var loginname = "";
     var mobile = "";
     var password = "";
     var logincode = "";
 
-    if (type == 1) { //邮箱
-      loginname = $("#loginname").val();
-      if (loginname.length == 0) {
-        $("#tips_name").html("<font color='red'>请输入邮箱或者用户名</font>");
-        return false;
-      }
+    loginname = $("#loginname").val();
+    if (loginname.length == 0) {
+      $("#tips_name").html("<font color='red'>请输入邮箱或者用户名</font>");
+      return false;
     }
+   
     password = $("#loginpassword").val();
     if (password.length == 0) {
       $("#tips_password").html("<font color='red'>请输入登录密码</font>");
@@ -118,7 +115,7 @@ $(function(){
     }
     
         logincode = $("#logincode").val();
-    if (logincode.length == 0) {
+    if (logincode.length != 6) {
       $("#tips_logincode").html("<font color='red'>请输入验证码</font>");
       return false;
     }
@@ -128,31 +125,22 @@ $(function(){
     
     $.ajax({
       type: "POST",
-      url: _ROOT_PATH + "index.php?c=passport",
+      url: "<?=Yii::$app->urlManager->createUrl('/api/common/ajaxlogin')?>",
       cache: false,
-      data: {a:"loginpost", type:type, loginname:loginname, mobile:mobile, password:password, checkcode:logincode, r:get_rndnum(8)},
+      data: {a:"loginpost", loginname:loginname, password:password, checkcode:logincode, r:get_rndnum(8)},
       dataType: "json",
       success: function(data) {
         $json = eval(data);
-        $response = $json.response;
-        $result = $json.result;
+        $response = $json.status;
         if ($response == "1") { //成功，返回页面
-          $forward = "";
-          //$forward = "http://s.phpcoo.com/";
-          if ($forward.length == 0) {
-            $forward = "/usercp.php";
-          }
-          window.location.href = $forward;          
-        }
-        else if ($response == "2") { //OE整合
-          window.top.location.href = $result;
-        } 
-        else {
-          if ($result.length > 0) {
-            $tips_post.html("<font color='red'>"+$result+"</font>");
-          }
-          else {
-            $tips_post.html("<font color='red'>登录失败，请检查帐号、密码是否正确。</font>");
+          layer.msg('登录成功')
+          window.location.href = $json.result.url;          
+        }else {
+           $tips_post.html($json.msg);
+          if($json.errcode == '315'){
+            window.top.location.href ="<?=Yii::$app->urlManager->createUrl('/home/user/checkemail')?>&id="+$json.attr.userid;
+          }else{
+            $("#captchaimg").click();
           }
         }
       },

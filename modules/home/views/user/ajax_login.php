@@ -74,7 +74,7 @@ use yii\captcha\Captcha;
      还没有注册会员？<a href="<?=Yii::$app->urlManager->createUrl('/home/user/reg')?>" class="oe_dialog_reg_but" target="_top">马上注册</a> 
     </li>
     <li>
-      忘记了密码？<a href="/index.php?c=passport&a=forget" target="_top">点击这里找回</a>
+      忘记了密码？<a href="<?=Yii::$app->urlManager->createUrl('/home/user/forgetpassword')?>" target="_top">点击这里找回</a>
     </li>
     </ul>
     <div class="clear"></div>
@@ -139,13 +139,15 @@ $(function(){
       success: function(data) {
         $json = eval(data);
         if ($json.status == "1") { //成功，返回页面
-          window.top.location.href ="<?=Yii::$app->urlManager->createUrl('/home/user/index')?>";
+          window.top.location.href = $json.result.url;
           
          // parent.location.reload();
         }else{
           showError($json.msg);
           if($json.errcode == '315'){
             window.top.location.href ="<?=Yii::$app->urlManager->createUrl('/home/user/checkemail')?>&id="+$json.attr.userid;
+          }else{
+            $("#captchaimg").click();
           }
           $("#btn_login").html("立即登录");
         }

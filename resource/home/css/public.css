@@ -14,6 +14,18 @@ a:hover{color:#f55964;}
 img{border:0;}
 i{font-style:normal;}
 .clear{clear:both;}
+/*--------------------- public -------------------------*/
+#btn_search{	
+	color:#fff;
+	background:#009EDF;
+	margin-left:10px;
+	display: inline-block;
+	height:34px;
+	width:100px;
+	border: 0px;
+	line-height:23px;
+	border-radius:5px;
+}
 /*--------------------- TOP Begin [Powered by OElove] -------------------------*/
 .oe-public-top {
 	width:100%;background:#fff;margin:0 auto; height:88px;
@@ -268,7 +280,7 @@ i{font-style:normal;}
 	margin-top:20px;margin-bottom:20px;
 }
 .oe-passport-puts h3{
-	line-height:35px;height:35px;padding-left:50px;
+	line-height:35px;height:35px;padding-left:50px;font-size:15px;font-weight:bold;
 }
 .oe-passport-puts dl {
 	height:45px;line-height:45px;margin-left:50px;position:relative;

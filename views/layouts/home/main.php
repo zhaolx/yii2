@@ -43,7 +43,7 @@
       <a href="http://s.phpcoo.com/index.php?c=story">晒幸福</a>
         <?php if(Yii::$app->session->get('userid')):?>
           <span>欢迎您：<?=Yii::$app->session->get('username')?></span>
-          <a href="<?php echo Yii::$app->urlManager->createUrl('/home/user/logout');?>"<i>退出登录</i></a>
+          <a href="<?php echo Yii::$app->urlManager->createUrl('/home/user/loggout');?>"<i>退出登录</i></a>
           <?php else: ?>
           <a href="###"  login-url="<?php echo Yii::$app->urlManager->createUrl('/home/user/login').'&is_ajax=1';?>" onclick="loginbox($(this).attr('login-url'));"><i>登录</i></a>
           <i></i>

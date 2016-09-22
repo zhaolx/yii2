@@ -9,17 +9,6 @@ $form = ActiveForm::begin([
 ?>
 <style type="text/css">
 #birthday-kvdate{width: 300px;}
-#btn_search{	
-	color:#fff;
-	background:#009EDF;
-	margin-left:10px;
-	display: inline-block;
-	height:34px;
-	width:100px;
-	border: 0px;
-	line-height:23px;
-	border-radius:5px;
-}
 </style>
 <div class="oe-public-box">
 
