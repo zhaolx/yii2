@@ -15,7 +15,8 @@
 	 	</div>
   </div>
   <!--//oe-public-help End-->
-
+  <form name="form" 
+  <input type="hidden" name="userid" value=""/> 
   <div class="oe-passport-puts">
 	<h3>第一步 填写邮箱，校验收到的验证码</h3>
 	<dl id="puts_email">
@@ -55,7 +56,7 @@
       <dd><em>*</em>确认密码：</dd>
       <dt>
 	    <input type="password" name="confirmpassword" id="confirmpassword" class="w1" />&nbsp;
-	    <span id="tips_confirmpassword">（请再输入以上新密码）</span>
+	    <span id="tips_confirmpassword">（请再输入新密码）</span>
 	  </dt>
 	  <div class="clear"></div>
     </dl>
@@ -94,6 +95,7 @@ $(function(){
 				
 				if ($response == "1") {
 					ToastShow("验证码已发送到您的邮箱，请查收。");
+					$("input[name='userid']").val($json.result.userid);
 					resend(60);
 				}else {
 					ToastShow($json.msg);
@@ -112,35 +114,14 @@ $(function(){
 
 	$("#btn_post").bind("click", function(){ //提交取回密码
 	
-		$username = $("#username").val();
-		if ($username.length == 0) {
-			ToastShow("请输入用户名");
+		$name = $("#email").val();
+		if ($name.length == 0) {
+			ToastShow("请输入邮箱地址");
 			return false;
 		}
-		$type = $('input[name="gettype"]:checked').val();
-		if ($type == "" || typeof($type) == 'undefined') {
-			ToastShow("请选择取回方式");
-			return false;
-		}
-
-		if ($type == 1) { //邮箱
-			$name = $("#email").val();
-			if ($name.length == 0) {
-				ToastShow("请输入邮箱地址");
-				return false;
-			}
-		}
-		else { //手机
-			$name = $("#mobile").val();
-			if ($name.length == 0) {
-				ToastShow("请输入手机号码");
-				return false;
-			}
-		}
-		
 		$validcode = $("#validcode").val();
-		if ($validcode.length == 0) {
-			ToastShow("请输入验证码");
+		if ($validcode.length != 6) {
+			ToastShow("请输入正确验证码");
 			return false;
 		}
 		$password = $("#password").val();
@@ -150,25 +131,22 @@ $(function(){
 			return false;
 		}
 		if ($confirmpassword != $password) {
-			ToastShow("确认密码不正确");
+			ToastShow("两次密码不一致");
 			return false;
 		}
 
 		
 		$.ajax({
 			type: "POST",
-			url: _ROOT_PATH + "index.php?c=passport",
+			url: "<?=Yii::$app->urlManager->createUrl('/api/common/checksafecode')?>",
 			cache: false,
-			data: {a:"getpassword", username:$username, type:$type, name:$name, validcode:$validcode, password:$password, r:get_rndnum(8)},
+			data: {type:1, user_id:$("input[name='userid']").val(), code:$validcode, r:get_rndnum(8)},
 			dataType: "json",
 			success: function(data) {
 				$json = eval(data);
 				$response = $json.status;
 				if ($response == "1") {
-					ToastShow("取回密码成功");
-					setTimeout(function(){
-						window.location.href = "/index.php?c=passport&a=login"
-					}, 1000);
+					
 				}
 				else {
 					if ($result.length > 0) {
@@ -189,7 +167,6 @@ $(function(){
 
 });
 function resend(t){
-	console.log(t);
 	if(t>0){
 		$("#btn_search").attr('disabled','disabled');
 		$("#btn_search").css("background","#e7e7e7");

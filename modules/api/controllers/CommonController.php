@@ -72,11 +72,11 @@ class CommonController extends Controller{
             $this->renderErrorMsg(400);
          }
         if(!$email){
-            $this->renderErrorMsg(301);
+            $this->renderErrorMsg(300);
         }
         $user = User::find()->where(['email' => $email])->one();
         if(!$user){
-             $this->renderErrorMsg(300);
+             $this->renderErrorMsg(316);
         }
         $CheckCode= rand(0,9).rand(0,9).rand(0,9).rand(0,9).rand(0,9).rand(0,9);
         if($type == 1){
@@ -95,10 +95,10 @@ class CommonController extends Controller{
             $model = new SafeCode;
             $model->user_id = $user->id;
             $model->code = $CheckCode;
-            $model->type = 1;
+            $model->type = $type+1;
             $model->create_time = time();
             $model->save();
-            $this->renderSuccessMsg('发送成功');
+            $this->renderSuccessMsg(['userid'=>$user->id]);
         }else{
             $this->renderErrorMsg(330);
         } 
@@ -108,15 +108,21 @@ class CommonController extends Controller{
    public function actionChecksafecode(){
         $user_id = isset($_REQUEST['user_id'])?$_REQUEST['user_id']:null;
         $code = isset($_REQUEST['code'])?$_REQUEST['code']:null;
+        $type = isset($_REQUEST['type'])?$_REQUEST['type']:null;
         if(!Yii::$app->request->isAjax){
             $this->renderErrorMsg(400);
          }
         if(!$user_id || !$code){
             $this->renderErrorMsg(301);
         }
+        if($type == 1){
+            $type = 2;
+        }else{
+            $type = 1;
+        }
         //清除过期验证码
         Yii::$app->db->createCommand("delete from safe_code where status = 0 and create_time < ".(time()-30*60))->execute();   
-        $safecode = SafeCode::find()->where(['user_id' => $user_id,'status'=>0])->orderBy('id desc')->one();
+        $safecode = SafeCode::find()->where(['user_id' => $user_id,'status'=>0,'type'=>$type])->orderBy('id desc')->one();
         if(!$safecode || $safecode->code != $code){
              $this->renderErrorMsg(320);
         }else{
