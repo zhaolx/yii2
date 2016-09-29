@@ -15,7 +15,6 @@
 	 	</div>
   </div>
   <!--//oe-public-help End-->
-  <form name="form" 
   <input type="hidden" name="userid" value=""/> 
   <div class="oe-passport-puts">
 	<h3>第一步 填写邮箱，校验收到的验证码</h3>
@@ -31,7 +30,7 @@
       <dd><em>*</em>验证码：</dd>
       <dt>
 	    <input type="text" id="validcode" name="validcode" class="w2" />
-		<button id="btn_search">重新发送</button>
+		<button id="btn_search">获取验证码</button>
 		<span id="tips_validcode">（输入邮箱/手机收到的验证码）</span>
 	  </dt>
 	  <div class="clear"></div>
@@ -108,12 +107,12 @@ $(function(){
 				$("#btn_search").val("获取验证码");
 			}
 		});
-
+		return false;
 	});
 
 
 	$("#btn_post").bind("click", function(){ //提交取回密码
-	
+		
 		$name = $("#email").val();
 		if ($name.length == 0) {
 			ToastShow("请输入邮箱地址");
@@ -138,28 +137,29 @@ $(function(){
 		
 		$.ajax({
 			type: "POST",
-			url: "<?=Yii::$app->urlManager->createUrl('/api/common/checksafecode')?>",
+			url: "<?=Yii::$app->urlManager->createUrl('/api/common/resetpassword')?>",
 			cache: false,
-			data: {type:1, user_id:$("input[name='userid']").val(), code:$validcode, r:get_rndnum(8)},
+			data: {password:$password, user_id:$("input[name='userid']").val(), code:$validcode,confirmpassword:$confirmpassword, r:get_rndnum(8)},
 			dataType: "json",
 			success: function(data) {
 				$json = eval(data);
 				$response = $json.status;
 				if ($response == "1") {
+					layer.alert('您的账户密码已重置，点击跳转到登录页面', {
+					  title :'温馨提示',
+					  icon: 6,
+					  skin: 'layer-ext-moon' 
+					},function(){
+						window.location.href = "<?=Yii::$app->urlManager->createUrl('/home/user/login')?>";
+					});
 					
-				}
-				else {
-					if ($result.length > 0) {
-						ToastShow($result);
-					}
-					else {
-						ToastShow("取回密码失败，请检查信息是否正确。");
-					}
+				}else {
+					ToastShow($json.msg);
 				}
 
 			},
 			error: function() {
-				ToastShow("取回密码失败，请检查网络！");
+				ToastShow("请求失败，请检查网络！");
 			}
 		});
 

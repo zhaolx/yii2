@@ -171,6 +171,40 @@ class CommonController extends Controller{
         }
     }
 
+    public function actionResetpassword(){
+        $user_id = isset($_REQUEST['user_id'])?$_REQUEST['user_id']:null;
+        $password = isset($_REQUEST['password'])?$_REQUEST['password']:null;
+        $confirmpassword = isset($_REQUEST['confirmpassword'])?$_REQUEST['confirmpassword']:null;
+        $passcode = isset($_REQUEST['code'])?$_REQUEST['code']:null;
+        if(!Yii::$app->request->isAjax){
+            $this->renderErrorMsg(400);
+         }
+        if(!$user_id || !$password || !$confirmpassword || !$passcode){
+            $this->renderErrorMsg(301);
+        }
+        $safecode = SafeCode::find()->where(['user_id' => $user_id,'status'=>0,'type'=>2])->orderBy('id desc')->one();
+        
+        if(!$safecode || $safecode->code != $passcode){
+            $this->renderErrorMsg(320);
+        }
+        if($password != $confirmpassword){
+            $this->renderErrorMsg(302);
+        }
+        $user = User::findOne($user_id); 
+        if(!$user){
+            $this->renderErrorMsg(500);
+        }
+        $user->password = md5($password);
+        if($user->save()){
+            $safecode->status = 1;
+            $safecode->update_time = time();
+            $safecode->save();
+            $this->renderSuccessMsg('密码重置成功');
+        }else{
+             $this->renderErrorMsg(500);
+        }
+    }
+
     private function renderSuccessMsg($msg){
 		header('Content-Type: application/json;charset=UTF-8');
 		$result = array('status' => 1, 'result'=>$msg);
